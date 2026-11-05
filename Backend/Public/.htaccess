@@ -1,0 +1,11 @@
+# GalviFintech API - reglas de reescritura para Apache (XAMPP)
+RewriteEngine On
+
+# 1) Reenvía la cabecera Authorization a PHP (Apache la descarta por defecto)
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# 2) Todo lo que no sea un archivo o carpeta real se envía a index.php (Slim)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
