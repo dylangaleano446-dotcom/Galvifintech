@@ -1,0 +1,10 @@
+# Dependencias de Composer (se reinstalan con "composer install")
+backend/vendor/
+
+# Configuración real con contraseñas: NUNCA se sube
+backend/src/Config/config.php
+
+# Archivos del sistema operativo y del editor
+Thumbs.db
+.DS_Store
+.vscode/
