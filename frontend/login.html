@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar | GalviFintech Portal</title>
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="icon" href="img/galvifintech-isotipo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+
+  <main class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <a href="index.html" class="block" aria-label="GalviFintech - volver al inicio">
+      <img src="img/galvifintech-logo.svg" alt="GalviFintech" class="mx-auto h-14 w-auto" height="56" width="266">
+    </a>
+    <h1 class="mt-2 text-center text-slate-500">Ingresá a tu portal financiero</h1>
+
+    <div id="alerta" class="hidden mt-6 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm" role="alert"></div>
+
+    <form id="form-login" class="mt-6 space-y-4" novalidate>
+      <div>
+        <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+        <input id="email" type="email" required autocomplete="username"
+               class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900">
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-slate-700">Contraseña</label>
+        <input id="password" type="password" required minlength="8" autocomplete="current-password"
+               class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900">
+      </div>
+      <button id="btn-ingresar" type="submit"
+              class="w-full rounded-lg bg-blue-950 py-2.5 font-semibold text-white hover:bg-blue-900 disabled:opacity-50">
+        Ingresar
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-xs text-slate-400">Cuenta demo: demo@galvifintech.com / Demo1234!</p>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script>
+    const form   = document.getElementById('form-login');
+    const alerta = document.getElementById('alerta');
+    const boton  = document.getElementById('btn-ingresar');
+
+    // Si ya hay sesion abierta, ir directo al panel
+    if (Sesion.token()) window.location.href = 'dashboard.html';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alerta.classList.add('hidden');
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email || !password) {
+        mostrarError('Completá email y contraseña.');
+        return;
+      }
+
+      boton.disabled = true;
+      boton.textContent = 'Verificando...';
+      try {
+        const datos = await api('/auth/login', { method: 'POST', body: { email, password } });
+        Sesion.guardar(datos.token, datos.usuario);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        mostrarError(err.message);
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Ingresar';
+      }
+    });
+
+    function mostrarError(texto) {
+      alerta.textContent = texto;
+      alerta.classList.remove('hidden');
+    }
+  </script>
+</body>
+  </html>
