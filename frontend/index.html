@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GalviFintech | Gestión financiera para PyMEs</title>
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="icon" href="img/galvifintech-isotipo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <meta name="description" content="Plataforma web de gestión financiera y control de gastos para PyMEs.">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-slate-800">
+
+  <!-- Navegacion -->
+  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="#" aria-label="GalviFintech - inicio"><img src="img/galvifintech-logo.svg" alt="GalviFintech" class="h-10 w-auto" height="40" width="190"></a>
+      <ul class="hidden md:flex gap-6 text-sm">
+        <li><a href="#nosotros" class="hover:text-blue-950">Nosotros</a></li>
+        <li><a href="#servicios" class="hover:text-blue-950">Servicios</a></li>
+        <li><a href="#planes" class="hover:text-blue-950">Planes</a></li>
+        <li><a href="#cotizador" class="hover:text-blue-950">Cotizar</a></li>
+      </ul>
+      <a href="login.html" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700">Ingresar al Portal</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-slate-900 to-blue-950 text-white">
+    <div class="max-w-6xl mx-auto px-4 py-20 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight">Dejá el cuaderno y el Excel. Controlá las finanzas de tu PyME en un solo lugar.</h1>
+        <p class="mt-4 text-slate-300">Registrá ingresos y gastos, fijá presupuestos y mirá tu balance en tiempo real desde cualquier dispositivo.</p>
+        <div class="mt-8 flex gap-3">
+          <a href="#cotizador" class="rounded-lg bg-white text-blue-950 px-5 py-3 font-semibold hover:bg-slate-200">Cotizar mi plan</a>
+          <a href="login.html" class="rounded-lg border border-white/40 px-5 py-3 hover:bg-white/10">Ver demo</a>
+        </div>
+      </div>
+      <div class="rounded-2xl bg-white/10 p-6 ring-1 ring-white/20">
+        <p class="text-sm text-slate-300">Balance de octubre</p>
+        <p class="text-3xl font-bold text-blue-300">$ 317.000,00</p>
+        <div class="mt-6 flex items-end gap-2 h-32">
+          <div class="w-1/6 bg-blue-400 rounded" style="height:60%"></div><div class="w-1/6 bg-red-400 rounded" style="height:45%"></div>
+          <div class="w-1/6 bg-blue-400 rounded" style="height:75%"></div><div class="w-1/6 bg-red-400 rounded" style="height:55%"></div>
+          <div class="w-1/6 bg-blue-400 rounded" style="height:90%"></div><div class="w-1/6 bg-red-400 rounded" style="height:80%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nosotros -->
+  <section id="nosotros" class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-3 gap-6">
+    <article class="rounded-2xl border p-6"><h3 class="font-semibold text-blue-950">Misión</h3>
+      <p class="mt-2 text-sm text-slate-600">Brindar a las PyMEs herramientas digitales simples, seguras y accesibles para ordenar y analizar su dinero.</p></article>
+    <article class="rounded-2xl border p-6"><h3 class="font-semibold text-blue-950">Visión</h3>
+      <p class="mt-2 text-sm text-slate-600">Ser la consultora de referencia en software financiero para PyMEs de la región hacia 2030.</p></article>
+    <article class="rounded-2xl border p-6"><h3 class="font-semibold text-blue-950">Valores</h3>
+      <p class="mt-2 text-sm text-slate-600">Transparencia, seguridad, simplicidad, compromiso, mejora continua y ética profesional.</p></article>
+  </section>
+
+  <!-- Servicios -->
+  <section id="servicios" class="bg-slate-50">
+    <div class="max-w-6xl mx-auto px-4 py-16">
+      <h2 class="text-3xl font-bold text-center">Servicios</h2>
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">GalviFintech Portal</h3><p class="mt-2 text-slate-600">Control de ingresos, gastos y presupuestos con dashboard gráfico.</p></article>
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">Migración de datos</h3><p class="mt-2 text-slate-600">Pasamos tus planillas de Excel o papel a la plataforma.</p></article>
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">Capacitación</h3><p class="mt-2 text-slate-600">Sesiones para el dueño y el personal administrativo.</p></article>
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">Soporte y mantenimiento</h3><p class="mt-2 text-slate-600">Consultas, correcciones y copias de seguridad.</p></article>
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">Desarrollo a medida</h3><p class="mt-2 text-slate-600">Módulos adicionales según la necesidad del cliente.</p></article>
+        <article class="rounded-2xl bg-white p-6 shadow-sm"><h3 class="font-semibold">Consultoría digital</h3><p class="mt-2 text-slate-600">Diagnóstico y plan de digitalización de tu PyME.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Planes -->
+  <section id="planes" class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-3xl font-bold text-center">Planes de abono mensual</h2>
+    <p class="text-center text-slate-500 mt-2 text-sm">Precios en USD + IVA. 5% de descuento pagando 6 meses y 15% pagando 12.</p>
+    <div class="mt-10 grid md:grid-cols-3 gap-6">
+      <article class="rounded-2xl border p-6"><h3 class="font-semibold">Básico</h3><p class="mt-2 text-3xl font-bold">USD 25</p>
+        <ul class="mt-4 space-y-1 text-sm text-slate-600"><li>1 usuario</li><li>Carga de movimientos</li><li>Dashboard con gráficos</li></ul></article>
+      <article class="rounded-2xl border-2 border-blue-950 p-6"><h3 class="font-semibold text-blue-950">PyME · recomendado</h3><p class="mt-2 text-3xl font-bold">USD 45</p>
+        <ul class="mt-4 space-y-1 text-sm text-slate-600"><li>Hasta 5 usuarios</li><li>Presupuestos y alertas</li><li>Exportación CSV</li></ul></article>
+      <article class="rounded-2xl border p-6"><h3 class="font-semibold">Empresa</h3><p class="mt-2 text-3xl font-bold">USD 85</p>
+        <ul class="mt-4 space-y-1 text-sm text-slate-600"><li>Hasta 15 usuarios</li><li>Todo lo del plan PyME</li><li>Soporte prioritario 24 h</li></ul></article>
+    </div>
+  </section>
+
+  <!-- Cotizador (UC04) -->
+  <section id="cotizador" class="bg-blue-950 text-white">
+    <div class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10">
+      <div>
+        <h2 class="text-3xl font-bold">Cotizá tu abono</h2>
+        <form id="form-cotizar" class="mt-6 space-y-4 text-sm">
+          <label class="block">Plan
+            <select name="plan" class="mt-1 w-full rounded-lg bg-blue-900 border border-blue-800 px-3 py-2">
+              <option value="basico">Básico</option><option value="pyme" selected>PyME</option><option value="empresa">Empresa</option>
+            </select></label>
+          <label class="block">Cantidad de usuarios
+            <input name="usuarios" type="number" min="1" max="100" value="3" class="mt-1 w-full rounded-lg bg-blue-900 border border-blue-800 px-3 py-2"></label>
+          <label class="block">Forma de pago
+            <select name="meses" class="mt-1 w-full rounded-lg bg-blue-900 border border-blue-800 px-3 py-2">
+              <option value="1">Mensual</option><option value="6">Semestral (−5%)</option><option value="12">Anual (−15%)</option>
+            </select></label>
+          <fieldset class="space-y-2"><legend>Módulos adicionales</legend>
+            <label class="flex gap-2"><input type="checkbox" name="modulos" value="presupuestos"> Presupuestos y alertas (USD 8)</label>
+            <label class="flex gap-2"><input type="checkbox" name="modulos" value="exportacion"> Exportación CSV (USD 10)</label>
+            <label class="flex gap-2"><input type="checkbox" name="modulos" value="soporte_prioritario"> Soporte prioritario (USD 15)</label>
+          </fieldset>
+          <button class="rounded-lg bg-white text-blue-950 px-5 py-2.5 font-semibold hover:bg-slate-200">Calcular</button>
+        </form>
+      </div>
+      <div id="resultado-cotizacion" class="rounded-2xl bg-white text-slate-800 p-6 text-sm">
+        <p class="text-slate-400">Completá el formulario y presioná Calcular.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-xs text-slate-400 py-8">
+    © 2026 GalviFintech · Proyecto Final 7° Año E.E.S.T. N°4 · Dylan Galeano
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById('form-cotizar').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const pedido = {
+        plan: f.get('plan'),
+        usuarios: Number(f.get('usuarios')),
+        meses: Number(f.get('meses')),
+        modulos: f.getAll('modulos'),
+      };
+      const caja = document.getElementById('resultado-cotizacion');
+      try {
+        const c = await api('/cotizaciones', { method: 'POST', body: pedido, base: API_NODE_URL });
+        const usd = (v) => `USD ${v.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+        caja.innerHTML = '';
+        const titulo = document.createElement('h3');
+        titulo.className = 'text-lg font-semibold';
+        titulo.textContent = `Plan ${c.plan} · ${c.usuarios} usuario/s · ${c.meses} mes/es`;
+        const tabla = document.createElement('table');
+        tabla.className = 'mt-4 w-full';
+        const filas = [
+          ...c.detalle_mensual.map((d) => [d.concepto, usd(d.importe)]),
+          ['Subtotal mensual', usd(c.subtotal_mensual)],
+          [`Subtotal ${c.meses} mes/es`, usd(c.subtotal_periodo)],
+          ['Descuento', `− ${usd(c.descuento)}`],
+          ['IVA 21%', usd(c.iva)],
+          ['TOTAL', usd(c.total)],
+        ];
+        filas.forEach(([concepto, importe], i) => {
+          const tr = tabla.insertRow();
+          if (i === filas.length - 1) tr.className = 'font-bold border-t';
+          tr.insertCell().textContent = concepto;
+          const td = tr.insertCell();
+          td.className = 'text-right py-1';
+          td.textContent = importe;
+        });
+        const nota = document.createElement('p');
+        nota.className = 'mt-4 text-xs text-slate-400';
+        nota.textContent = `Cotización válida por ${c.validez_dias} días.`;
+        caja.append(titulo, tabla, nota);
+      } catch (err) {
+        caja.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>
