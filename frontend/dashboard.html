@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | GalviFintech Portal</title>
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="icon" href="img/galvifintech-isotipo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+  <!-- Barra superior -->
+  <header class="bg-blue-950 text-white">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="img/galvifintech-logo-negativo.svg" alt="GalviFintech" class="h-9 w-auto" height="36" width="171">
+        <span class="text-sm text-slate-400 border-l border-slate-700 pl-3">Portal</span></div>
+      <div class="flex items-center gap-4 text-sm">
+        <span id="nombre-empresa" class="hidden sm:inline text-slate-300"></span>
+        <button id="btn-salir" class="rounded-lg border border-blue-800 px-3 py-1.5 hover:bg-blue-900">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- Titulo y filtros -->
+    <section class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold">Resumen financiero</h1>
+        <p class="text-slate-500 text-sm">Ingresos, gastos y presupuesto del período seleccionado</p>
+      </div>
+      <div class="flex items-end gap-2">
+        <label class="text-sm">Período
+          <input id="periodo" type="month" class="block mt-1 rounded-lg border border-slate-300 px-3 py-2">
+        </label>
+        <button id="btn-exportar" class="rounded-lg bg-white border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Exportar CSV</button>
+      </div>
+    </section>
+
+    <div id="mensaje" class="hidden rounded-lg px-4 py-3 text-sm" role="status"></div>
+
+    <!-- Tarjetas KPI -->
+    <section class="grid gap-4 sm:grid-cols-3">
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Ingresos del mes</p>
+        <p id="kpi-ingresos" class="mt-1 text-2xl font-bold text-blue-700">—</p>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Gastos del mes</p>
+        <p id="kpi-gastos" class="mt-1 text-2xl font-bold text-red-600">—</p>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Balance</p>
+        <p id="kpi-balance" class="mt-1 text-2xl font-bold">—</p>
+      </article>
+    </section>
+
+    <!-- Graficos -->
+    <section class="grid gap-4 lg:grid-cols-3">
+      <article class="rounded-2xl bg-white p-5 shadow-sm lg:col-span-2">
+        <h2 class="font-semibold">Ingresos vs. gastos — últimos 6 meses</h2>
+        <div class="mt-4 h-72"><canvas id="grafico-evolucion"></canvas></div>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <h2 class="font-semibold">Gastos por categoría</h2>
+        <div class="mt-4 h-72"><canvas id="grafico-categorias"></canvas></div>
+      </article>
+    </section>
+
+    <section class="grid gap-4 lg:grid-cols-3">
+      <!-- Formulario de carga (UC02) -->
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <h2 class="font-semibold">Registrar movimiento</h2>
+        <form id="form-transaccion" class="mt-4 space-y-3 text-sm" novalidate>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 rounded-lg border p-2 cursor-pointer">
+              <input type="radio" name="tipo" value="gasto" checked> Gasto</label>
+            <label class="flex items-center gap-2 rounded-lg border p-2 cursor-pointer">
+              <input type="radio" name="tipo" value="ingreso"> Ingreso</label>
+          </div>
+          <label class="block">Categoría
+            <input name="categoria" list="lista-categorias" required maxlength="50" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            <datalist id="lista-categorias">
+              <option value="Ventas"><option value="Proveedores"><option value="Sueldos">
+              <option value="Alquiler"><option value="Servicios"><option value="Impuestos">
+            </datalist>
+          </label>
+          <label class="block">Descripción
+            <input name="descripcion" required maxlength="255" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="block">Monto ($)
+              <input name="monto" type="number" min="0.01" step="0.01" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            </label>
+            <label class="block">Fecha
+              <input name="fecha" type="date" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            </label>
+          </div>
+          <label class="block">Medio de pago
+            <select name="medio_pago" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+              <option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option>
+              <option value="debito">Débito</option><option value="credito">Crédito</option><option value="otro">Otro</option>
+            </select>
+          </label>
+          <label class="block">N° de comprobante (opcional)
+            <input name="comprobante" maxlength="50" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+          </label>
+          <button type="submit" class="w-full rounded-lg bg-blue-950 py-2.5 font-semibold text-white hover:bg-blue-900">Guardar</button>
+        </form>
+      </article>
+
+      <!-- Presupuestos -->
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <h2 class="font-semibold">Presupuesto del mes</h2>
+        <ul id="lista-presupuestos" class="mt-4 space-y-4 text-sm"></ul>
+      </article>
+
+      <!-- Ultimos movimientos -->
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <h2 class="font-semibold">Movimientos del período</h2>
+        <div class="mt-4 max-h-96 overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-slate-500"><tr><th class="py-1">Fecha</th><th>Detalle</th><th class="text-right">Monto</th><th></th></tr></thead>
+            <tbody id="tabla-movimientos" class="divide-y"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+  </html>
