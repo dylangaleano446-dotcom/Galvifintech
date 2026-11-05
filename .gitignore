@@ -1,8 +1,10 @@
-# Dependencias de Composer (se reinstalan con "composer install")
+# Dependencias (se reinstalan con "composer install" y "npm install")
 backend/vendor/
+servicio-node/node_modules/
 
 # Configuración real con contraseñas: NUNCA se sube
 backend/src/Config/config.php
+servicio-node/src/config.json
 
 # Archivos del sistema operativo y del editor
 Thumbs.db
