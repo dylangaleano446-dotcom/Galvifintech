@@ -25,6 +25,16 @@ const Sesion = {
     // Si no hay sesion, vuelve al login
     if (!this.token()) window.location.href = 'login.html';
   },
+  /** Pantalla de inicio segun el rol: el personal de GalviFintech va al panel de administracion. */
+  inicio() {
+    const u = this.usuario();
+    return u && u.rol === 'staff' ? 'admin.html' : 'dashboard.html';
+  },
+  /** Cierra la sesion y deja un mensaje para mostrar en el login (ej.: cuenta suspendida). */
+  cerrarConAviso(texto) {
+    sessionStorage.setItem('gf_aviso', texto);
+    this.cerrar();
+  },
 };
 
 /**
@@ -35,7 +45,7 @@ const Sesion = {
 async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
   const cabeceras = { Accept: 'application/json' };
   if (body !== null) cabeceras['Content-Type'] = 'application/json';
-  if (Sesion.token()) cabeceras.Authorization = `Bearer ${Sesion.token()}`;
+  if (Sesion.token()) cabeceras.Authorization = Bearer ${Sesion.token()};
 
   const respuesta = await fetch(base + ruta, {
     method,
@@ -52,8 +62,15 @@ async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
   if (respuesta.status === 204) return null;
 
   const datos = await respuesta.json().catch(() => ({}));
+
+  // Abono vencido con la sesion abierta: se cierra y el login explica el motivo
+  if (respuesta.status === 403 && datos.codigo === 'cuenta_suspendida' && Sesion.token()) {
+    Sesion.cerrarConAviso(datos.error);
+    throw new Error(datos.error);
+  }
+
   if (!respuesta.ok) {
-    const error = new Error(datos.error || `Error ${respuesta.status}`);
+    const error = new Error(datos.error || Error ${respuesta.status});
     error.detalles = datos.detalles || {};
     error.status = respuesta.status;
     throw error;
@@ -61,7 +78,14 @@ async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
   return datos;
 }
 
+/** Formatea una fecha AAAA-MM-DD como DD/MM/AAAA. */
+function formatoFecha(iso) {
+  if (!iso) return '—';
+  const [a, m, d] = iso.slice(0, 10).split('-');
+  return ${d}/${m}/${a};
+}
+
 /** Formatea un numero como pesos argentinos: $ 1.234.567,89 */
 function formatoPesos(valor) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(valor);
-                                             }
+}
