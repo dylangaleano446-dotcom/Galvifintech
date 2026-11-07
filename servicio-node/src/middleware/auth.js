@@ -17,7 +17,7 @@ function cuentaBloqueada(rol, abonoHasta) {
 function mensajeBloqueo(abonoHasta) {
   if (!abonoHasta) return 'Tu cuenta todavía no tiene un abono activo. Comunicate con GalviFintech para habilitarla.';
   const [a, m, d] = abonoHasta.split('-');
-  return Cuenta suspendida por falta de pago. Tu abono venció el ${d}/${m}/${a}. Comunicate con GalviFintech para renovarlo.;
+  return 'Cuenta suspendida por falta de pago. Tu abono venció el' ${d}/${m}/${a}'. Comunicate con GalviFintech para renovarlo'.;
 }
 
 function crearAuth({ secret, issuer }, db) {
