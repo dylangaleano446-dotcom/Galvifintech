@@ -1,3 +1,4 @@
+
 <?php
 /**
  * GalviFintech Portal - API REST
@@ -7,22 +8,24 @@
 declare(strict_types=1);
 
 use App\Config\Database;
+use App\Controllers\AdminController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\PresupuestoController;
 use App\Controllers\TransaccionController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CorsMiddleware;
+use App\Middleware\SoloStaffMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 
-require __DIR__ . '/../vendor/autoload.php';
+require _DIR_ . '/../vendor/autoload.php';
 
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-$config = require __DIR__ . '/../src/Config/config.php';
+$config = require _DIR_ . '/../src/Config/config.php';
 $db     = Database::conectar($config['db']);
 
 // ---------------------------------------------------------------------
@@ -46,13 +49,15 @@ $auth          = new AuthController($db, $config['jwt']);
 $transacciones = new TransaccionController($db);
 $dashboard     = new DashboardController($db);
 $presupuestos  = new PresupuestoController($db);
-$requiereLogin = new AuthMiddleware($config['jwt']);
+$admin         = new AdminController($db);
+$requiereLogin = new AuthMiddleware($config['jwt'], $db); // tambien controla que el abono este al dia
+$soloStaff     = new SoloStaffMiddleware();
 
 // ---------------------------------------------------------------------
 // Rutas
 // ---------------------------------------------------------------------
 $app->group('/api', function (RouteCollectorProxy $api) use (
-    $auth, $transacciones, $dashboard, $presupuestos, $requiereLogin
+    $auth, $transacciones, $dashboard, $presupuestos, $admin, $requiereLogin, $soloStaff
 ) {
     // Estado de la API (sirve para comprobar que Apache + Slim funcionan)
     $api->get('/health', function (Request $req, Response $res) {
@@ -78,6 +83,15 @@ $app->group('/api', function (RouteCollectorProxy $api) use (
         $privado->get('/presupuestos',                  [$presupuestos, 'listar']);
         $privado->post('/presupuestos',                 [$presupuestos, 'guardar']);
     })->add($requiereLogin);
+
+    // Panel de administracion: solo personal de GalviFintech (rol staff)
+    // Slim ejecuta primero el ultimo middleware agregado: login -> staff -> ruta
+    $api->group('/admin', function (RouteCollectorProxy $adm) use ($admin) {
+        $adm->get('/clientes',  [$admin, 'clientes']);
+        $adm->post('/clientes', [$admin, 'crearCliente']);
+        $adm->get('/pagos',     [$admin, 'pagos']);
+        $adm->post('/pagos',    [$admin, 'registrarPago']);
+    })->add($soloStaff)->add($requiereLogin);
 });
 
 $app->run();
