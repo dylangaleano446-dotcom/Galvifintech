@@ -1,4 +1,3 @@
-
 <?php
 /**
  * GalviFintech Portal - API REST
@@ -21,11 +20,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 
-require _DIR_ . '/../vendor/autoload.php';
+require __DIR__. '/../vendor/autoload.php';
 
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-$config = require _DIR_ . '/../src/Config/config.php';
+$config = require __DIR__ . '/../src/Config/config.php';
 $db     = Database::conectar($config['db']);
 
 // ---------------------------------------------------------------------
