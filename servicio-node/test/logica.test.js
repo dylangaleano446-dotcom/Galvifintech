@@ -45,3 +45,13 @@ test('neutraliza formulas de Excel (CSV injection)', () => {
   assert.equal(neutralizarFormula('=SUMA(A1:A9)'), "'=SUMA(A1:A9)");
   assert.equal(neutralizarFormula('Ventas'), 'Ventas');
 });
+
+test('bloquea cuentas con el abono vencido o sin pagar (el personal no paga)', () => {
+  const { cuentaBloqueada } = require('../src/middleware/auth');
+  const fecha = (dias) => { const d = new Date(); d.setDate(d.getDate() + dias); return d.toLocaleDateString('en-CA'); };
+  assert.equal(cuentaBloqueada('cliente', fecha(10)), false); // al dia
+  assert.equal(cuentaBloqueada('cliente', fecha(0)), false);  // hoy es el ultimo dia pagado
+  assert.equal(cuentaBloqueada('cliente', fecha(-1)), true);  // vencio ayer: sin dias de gracia
+  assert.equal(cuentaBloqueada('cliente', null), true);       // nunca pago
+  assert.equal(cuentaBloqueada('staff', null), false);
+});
