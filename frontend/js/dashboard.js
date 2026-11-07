@@ -20,10 +20,10 @@ const NOMBRE_PLAN = { basico: 'Básico', pyme: 'PyME', empresa: 'Empresa' };
 // ---------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const usuario = Sesion.usuario();
-  $('nombre-empresa').textContent = usuario ? ${usuario.nombre} · ${usuario.empresa} : '';
+  $('nombre-empresa').textContent = usuario ? (usuario.nombre) + ' · ' + (usuario.empresa) : '';
 
   const hoy = new Date();
-  $('periodo').value = ${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')};
+  $('periodo').value = (hoy.getFullYear()) + '-' + (String(hoy.getMonth() + 1).padStart(2, '0'));
   document.querySelector('[name="fecha"]').value = hoyISO();
 
   $('periodo').addEventListener('change', cargarTodo);
@@ -44,12 +44,12 @@ async function mostrarAbono() {
     const caja = $('abono');
     const plan = NOMBRE_PLAN[u.plan] || '—';
     if (u.estado === 'por_vencer') {
-      const cuando = u.dias_restantes === 0 ? 'hoy' : en ${u.dias_restantes} día${u.dias_restantes === 1 ? '' : 's'};
-      caja.textContent = `Tu abono del plan ${plan} vence ${cuando} (${formatoFecha(u.abono_hasta)}). `
+      const cuando = u.dias_restantes === 0 ? 'hoy' : 'en ' + (u.dias_restantes) + ' día' + (u.dias_restantes === 1 ? '' : 's');
+      caja.textContent = 'Tu abono del plan ' + (plan) + ' vence ' + (cuando) + ' (' + (formatoFecha(u.abono_hasta)) + '). '
         + 'Renovalo para no perder el acceso: al día siguiente la cuenta se suspende.';
       caja.className = 'rounded-lg px-4 py-3 text-sm bg-red-50 border border-red-200 text-red-700 font-medium';
     } else {
-      caja.textContent = Plan ${plan} · Abono pagado hasta el ${formatoFecha(u.abono_hasta)};
+      caja.textContent = 'Plan ' + (plan) + ' · Abono pagado hasta el ' + (formatoFecha(u.abono_hasta));
       caja.className = 'rounded-lg px-4 py-3 text-sm bg-white border border-slate-200 text-slate-600';
     }
   } catch (err) {
@@ -61,7 +61,7 @@ function periodoSeleccionado() {
   const [anio, mes] = $('periodo').value.split('-').map(Number);
   const ultimoDia = new Date(anio, mes, 0).getDate();
   const mm = String(mes).padStart(2, '0');
-  return { anio, mes, desde: ${anio}-${mm}-01, hasta: ${anio}-${mm}-${ultimoDia} };
+  return { anio, mes, desde: (anio) + '-' + (mm) + '-01', hasta: (anio) + '-' + (mm) + '-' + (ultimoDia) };
 }
 
 async function cargarTodo() {
@@ -77,12 +77,12 @@ async function cargarTodo() {
 // ---------------------------------------------------------------------
 async function cargarResumen() {
   const { anio, mes } = periodoSeleccionado();
-  const r = await api(/dashboard/resumen?anio=${anio}&mes=${mes});
+  const r = await api('/dashboard/resumen?anio=' + (anio) + '&mes=' + (mes));
 
   $('kpi-ingresos').textContent = formatoPesos(r.ingresos);
   $('kpi-gastos').textContent = formatoPesos(r.gastos);
   $('kpi-balance').textContent = formatoPesos(r.balance);
-  $('kpi-balance').className = mt-1 text-2xl font-bold ${r.balance >= 0 ? 'text-blue-700' : 'text-red-600'};
+  $('kpi-balance').className = 'mt-1 text-2xl font-bold ' + (r.balance >= 0 ? 'text-blue-700' : 'text-red-600');
 
   dibujarEvolucion(r.evolucion);
   dibujarCategorias(r.gastos_categoria);
@@ -92,7 +92,7 @@ async function cargarResumen() {
 function dibujarEvolucion(evolucion) {
   const etiquetas = evolucion.map((e) => {
     const [a, m] = e.periodo.split('-');
-    return ${MESES[Number(m) - 1]} ${a.slice(2)};
+    return (MESES[Number(m) - 1]) + ' ' + (a.slice(2));
   });
   if (graficoEvolucion) graficoEvolucion.destroy(); // evita graficos superpuestos
   graficoEvolucion = new Chart($('grafico-evolucion'), {
@@ -107,7 +107,7 @@ function dibujarEvolucion(evolucion) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { tooltip: { callbacks: { label: (c) => ${c.dataset.label}: ${formatoPesos(c.parsed.y)} } } },
+      plugins: { tooltip: { callbacks: { label: (c) => (c.dataset.label) + ': ' + (formatoPesos(c.parsed.y)) } } },
       scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatoPesos(v) } } },
     },
   });
@@ -126,7 +126,7 @@ function dibujarCategorias(categorias) {
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom' },
-        tooltip: { callbacks: { label: (c) => ${c.label}: ${formatoPesos(c.parsed)} } },
+        tooltip: { callbacks: { label: (c) => (c.label) + ': ' + (formatoPesos(c.parsed)) } },
       },
     },
   });
@@ -149,14 +149,14 @@ function dibujarPresupuestos(presupuestos) {
     nombre.textContent = p.categoria; // textContent evita inyeccion de HTML (XSS)
     const cifras = document.createElement('span');
     cifras.className = p.estado === 'excedido' ? 'text-red-600 font-semibold' : 'text-slate-500';
-    cifras.textContent = ${formatoPesos(p.gastado)} / ${formatoPesos(p.limite)} (${p.porcentaje}%);
+    cifras.textContent = (formatoPesos(p.gastado)) + ' / ' + (formatoPesos(p.limite)) + ' (' + (p.porcentaje) + '%)';
     cabecera.append(nombre, cifras);
 
     const barra = document.createElement('div');
     barra.className = 'mt-1 h-2 rounded-full bg-slate-200';
     const relleno = document.createElement('div');
-    relleno.className = h-2 rounded-full ${colorEstado[p.estado]};
-    relleno.style.width = ${Math.min(p.porcentaje, 100)}%;
+    relleno.className = 'h-2 rounded-full ' + (colorEstado[p.estado]);
+    relleno.style.width = (Math.min(p.porcentaje, 100)) + '%';
     barra.append(relleno);
 
     li.append(cabecera, barra);
@@ -169,7 +169,7 @@ function dibujarPresupuestos(presupuestos) {
 // ---------------------------------------------------------------------
 async function cargarMovimientos() {
   const { desde, hasta } = periodoSeleccionado();
-  const r = await api(/transacciones?desde=${desde}&hasta=${hasta});
+  const r = await api('/transacciones?desde=' + (desde) + '&hasta=' + (hasta));
   const tbody = $('tabla-movimientos');
   tbody.innerHTML = '';
 
@@ -180,14 +180,10 @@ async function cargarMovimientos() {
   r.datos.forEach((t) => {
     const fila = document.createElement('tr');
     const [a, m, d] = t.fecha.split('-');
-    fila.innerHTML = `
-      <td class="py-2 whitespace-nowrap">${d}/${m}</td>
-      <td class="py-2"><span class="block"></span><span class="block text-xs text-slate-400"></span></td>
-      <td class="py-2 text-right whitespace-nowrap ${t.tipo === 'ingreso' ? 'text-blue-700' : 'text-red-600'}"></td>
-      <td class="py-2 text-right"><button class="rounded px-1.5 text-slate-400 hover:text-red-600" title="Eliminar">✕</button></td>`;
+    fila.innerHTML = ' <td class="py-2 whitespace-nowrap">' + (d) + '/' + (m) + '</td> <td class="py-2"><span class="block"></span><span class="block text-xs text-slate-400"></span></td> <td class="py-2 text-right whitespace-nowrap ' + (t.tipo === 'ingreso' ? 'text-blue-700' : 'text-red-600') + '"></td> <td class="py-2 text-right"><button class="rounded px-1.5 text-slate-400 hover:text-red-600" title="Eliminar">✕</button></td>';
     fila.querySelector('td:nth-child(2) span:first-child').textContent = t.descripcion;
     fila.querySelector('td:nth-child(2) span:last-child').textContent = t.categoria;
-    fila.querySelector('td:nth-child(3)').textContent = ${t.tipo === 'ingreso' ? '+' : '−'} ${formatoPesos(t.monto)};
+    fila.querySelector('td:nth-child(3)').textContent = (t.tipo === 'ingreso' ? '+' : '−') + ' ' + (formatoPesos(t.monto));
     fila.querySelector('button').addEventListener('click', (e) => pedirConfirmacion(e.currentTarget, t.id));
     tbody.append(fila);
   });
@@ -210,7 +206,7 @@ async function guardarTransaccion(e) {
     await cargarTodo();
   } catch (err) {
     const detalle = Object.values(err.detalles || {}).join(' ');
-    mostrarMensaje(${err.message}. ${detalle}, 'error');
+    mostrarMensaje((err.message) + '. ' + (detalle), 'error');
   }
 }
 
@@ -236,7 +232,7 @@ function pedirConfirmacion(boton, id) {
 
 async function eliminarTransaccion(id) {
   try {
-    await api(/transacciones/${id}, { method: 'DELETE' });
+    await api('/transacciones/' + (id), { method: 'DELETE' });
     mostrarMensaje('Movimiento eliminado.', 'ok');
     await cargarTodo();
   } catch (err) {
@@ -250,19 +246,19 @@ async function eliminarTransaccion(id) {
 async function exportarCsv() {
   const { desde, hasta } = periodoSeleccionado();
   try {
-    const resp = await fetch(${API_NODE_URL}/reportes/transacciones.csv?desde=${desde}&hasta=${hasta}, {
-      headers: { Authorization: Bearer ${Sesion.token()} },
+    const resp = await fetch((API_NODE_URL) + '/reportes/transacciones.csv?desde=' + (desde) + '&hasta=' + (hasta), {
+      headers: { Authorization: 'Bearer ' + (Sesion.token()) },
     });
     if (!resp.ok) {
       // Muestra el motivo real que devuelve el servicio (token, abono vencido, base de datos...)
       const datos = await resp.json().catch(() => ({}));
       if (resp.status === 403 && datos.codigo === 'cuenta_suspendida') Sesion.cerrarConAviso(datos.error);
-      throw new Error(No se pudo generar el reporte: ${datos.error || `error ${resp.status}}`);
+      throw new Error('No se pudo generar el reporte: ' + (datos.error || 'error ' + (resp.status)));
     }
     const archivo = await resp.blob();
     const enlace = document.createElement('a');
     enlace.href = URL.createObjectURL(archivo);
-    enlace.download = galvifintech_${desde}_${hasta}.csv;
+    enlace.download = 'galvifintech_' + (desde) + '_' + (hasta) + '.csv';
     enlace.click();
     URL.revokeObjectURL(enlace.href);
   } catch (err) {
@@ -280,9 +276,9 @@ async function exportarCsv() {
 function mostrarMensaje(texto, tipo) {
   const caja = $('mensaje');
   caja.textContent = texto;
-  caja.className = `rounded-lg px-4 py-3 text-sm ${tipo === 'ok'
+  caja.className = 'rounded-lg px-4 py-3 text-sm ' + (tipo === 'ok'
     ? 'bg-blue-50 border border-blue-200 text-blue-800'
-    : 'bg-red-50 border border-red-200 text-red-700'}`;
+    : 'bg-red-50 border border-red-200 text-red-700');
   clearTimeout(mostrarMensaje.timer);
   mostrarMensaje.timer = setTimeout(() => caja.classList.add('hidden'), 4000);
 }
