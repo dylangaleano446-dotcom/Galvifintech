@@ -24,10 +24,13 @@ abstract class BaseController
                    ->withStatus($status);
     }
 
-    /** Respuesta de error estandar: { "error": "...", "detalles": {...} } */
-    protected function error(Response $res, string $mensaje, int $status, array $detalles = []): Response
+    /** Respuesta de error estandar: { "error": "...", "codigo": "...", "detalles": {...} } */
+    protected function error(Response $res, string $mensaje, int $status, array $detalles = [], ?string $codigo = null): Response
     {
         $cuerpo = ['error' => $mensaje];
+        if ($codigo !== null) {
+            $cuerpo['codigo'] = $codigo; // permite al frontend reconocer casos especiales
+        }
         if ($detalles !== []) {
             $cuerpo['detalles'] = $detalles;
         }
