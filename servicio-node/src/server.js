@@ -13,7 +13,7 @@ const { generarCsv } = require('./logica/csv');
 
 const app = express();
 const db = mysql.createPool({ ...config.db, dateStrings: true, connectionLimit: 5 });
-const requiereLogin = crearAuth(config.jwt);
+const requiereLogin = crearAuth(config.jwt,db);
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 
 // ---------------------------------------------------------------------
