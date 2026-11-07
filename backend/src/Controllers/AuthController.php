@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Servicios\Abono;
+use App\Servicios\ValidadorUsuario;
 use Firebase\JWT\JWT;
 use PDO;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -10,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * UC01 - Registro, inicio de sesion y datos del usuario autenticado.
+ * Las cuentas sin abono pagado no pueden iniciar sesion.
  */
 final class AuthController extends BaseController
 {
@@ -21,38 +24,16 @@ final class AuthController extends BaseController
         parent::__construct($db);
     }
 
-    /** POST /api/auth/register */
+    /** POST /api/auth/register  (la cuenta queda pendiente hasta registrar el primer pago) */
     public function registrar(Request $req, Response $res): Response
     {
-        $d = $this->body($req);
-        $nombre   = trim((string) ($d['nombre'] ?? ''));
-        $email    = strtolower(trim((string) ($d['email'] ?? '')));
-        $password = (string) ($d['password'] ?? '');
-        $empresa  = trim((string) ($d['empresa'] ?? ''));
-        $cuit     = preg_replace('/\D/', '', (string) ($d['cuit'] ?? ''));
-
-        $errores = [];
-        if (mb_strlen($nombre) < 3 || mb_strlen($nombre) > 100) {
-            $errores['nombre'] = 'Debe tener entre 3 y 100 caracteres.';
-        }
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 150) {
-            $errores['email'] = 'Email invalido.';
-        }
-        if (strlen($password) < 8 || !preg_match('/[A-Za-z]/', $password) || !preg_match('/\d/', $password)) {
-            $errores['password'] = 'Minimo 8 caracteres, con al menos una letra y un numero.';
-        }
-        if (mb_strlen($empresa) < 2 || mb_strlen($empresa) > 150) {
-            $errores['empresa'] = 'Debe tener entre 2 y 150 caracteres.';
-        }
-        if ($cuit !== '' && strlen($cuit) !== 11) {
-            $errores['cuit'] = 'El CUIT debe tener 11 digitos.';
-        }
+        [$d, $errores] = ValidadorUsuario::validar($this->body($req));
         if ($errores !== []) {
             return $this->error($res, 'Datos invalidos', 422, $errores);
         }
 
         $existe = $this->db->prepare('SELECT id FROM usuarios WHERE email = :email');
-        $existe->execute(['email' => $email]);
+        $existe->execute(['email' => $d['email']]);
         if ($existe->fetch()) {
             return $this->error($res, 'El email ya esta registrado', 409);
         }
@@ -62,16 +43,16 @@ final class AuthController extends BaseController
              VALUES (:nombre, :email, :hash, :empresa, :cuit)'
         );
         $stmt->execute([
-            'nombre'  => $nombre,
-            'email'   => $email,
-            'hash'    => password_hash($password, PASSWORD_DEFAULT), // bcrypt con sal aleatoria
-            'empresa' => $empresa,
-            'cuit'    => $cuit !== '' ? $cuit : null,
+            'nombre'  => $d['nombre'],
+            'email'   => $d['email'],
+            'hash'    => password_hash($d['password'], PASSWORD_DEFAULT), // bcrypt con sal aleatoria
+            'empresa' => $d['empresa'],
+            'cuit'    => $d['cuit'] !== '' ? $d['cuit'] : null,
         ]);
 
         return $this->json($res, [
             'id'      => (int) $this->db->lastInsertId(),
-            'mensaje' => 'Cuenta creada correctamente',
+            'mensaje' => 'Cuenta creada. Se habilita cuando se registre el primer pago del abono.',
         ], 201);
     }
 
@@ -87,7 +68,7 @@ final class AuthController extends BaseController
         }
 
         $stmt = $this->db->prepare(
-            'SELECT id, nombre, email, password_hash, empresa, rol,
+            'SELECT id, nombre, email, password_hash, empresa, rol, plan, abono_hasta,
                     intentos_fallidos, bloqueado_hasta
                FROM usuarios WHERE email = :email'
         );
@@ -120,6 +101,11 @@ final class AuthController extends BaseController
             $re->execute(['h' => password_hash($password, PASSWORD_DEFAULT), 'id' => $u['id']]);
         }
 
+        // Abono vencido o sin pagar: no entra (se controla despues de la clave para no revelar datos)
+        if (Abono::bloqueada($u['rol'], $u['abono_hasta'])) {
+            return $this->error($res, Abono::mensajeBloqueo($u['abono_hasta']), 403, [], 'cuenta_suspendida');
+        }
+
         $emitido = time();
         $expira  = $emitido + (int) $this->jwtConfig['expiracion'];
         $token = JWT::encode([
@@ -140,7 +126,8 @@ final class AuthController extends BaseController
                 'email'   => $u['email'],
                 'empresa' => $u['empresa'],
                 'rol'     => $u['rol'],
-            ],
+                'plan'    => $u['plan'],
+            ] + Abono::estado($u['rol'], $u['abono_hasta']),
         ]);
     }
 
@@ -148,7 +135,7 @@ final class AuthController extends BaseController
     public function me(Request $req, Response $res): Response
     {
         $stmt = $this->db->prepare(
-            'SELECT id, nombre, email, empresa, cuit, rol, mfa_habilitado, creado_en
+            'SELECT id, nombre, email, empresa, cuit, rol, plan, abono_hasta, mfa_habilitado, creado_en
                FROM usuarios WHERE id = :id'
         );
         $stmt->execute(['id' => $this->usuarioId($req)]);
@@ -159,7 +146,7 @@ final class AuthController extends BaseController
         }
         $u['id'] = (int) $u['id'];
         $u['mfa_habilitado'] = (bool) $u['mfa_habilitado'];
-        return $this->json($res, $u);
+        return $this->json($res, $u + Abono::estado($u['rol'], $u['abono_hasta']));
     }
 
     private function registrarIntentoFallido(int $id, int $intentosPrevios): void
