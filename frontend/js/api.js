@@ -45,7 +45,7 @@ const Sesion = {
 async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
   const cabeceras = { Accept: 'application/json' };
   if (body !== null) cabeceras['Content-Type'] = 'application/json';
-  if (Sesion.token()) cabeceras.Authorization = Bearer ${Sesion.token()};
+  if (Sesion.token()) cabeceras.Authorization = 'Bearer ' + (Sesion.token());
 
   const respuesta = await fetch(base + ruta, {
     method,
@@ -70,7 +70,7 @@ async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
   }
 
   if (!respuesta.ok) {
-    const error = new Error(datos.error || Error ${respuesta.status});
+    const error = new Error(datos.error || 'Error ' + (respuesta.status));
     error.detalles = datos.detalles || {};
     error.status = respuesta.status;
     throw error;
@@ -82,7 +82,7 @@ async function api(ruta, { method = 'GET', body = null, base = API_URL } = {}) {
 function formatoFecha(iso) {
   if (!iso) return '—';
   const [a, m, d] = iso.slice(0, 10).split('-');
-  return ${d}/${m}/${a};
+  return (d) + '/' + (m) + '/' + (a);
 }
 
 /** Formatea un numero como pesos argentinos: $ 1.234.567,89 */
