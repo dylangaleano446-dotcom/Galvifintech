@@ -36,7 +36,7 @@
       </button>
     </form>
 
-    <p class="mt-6 text-center text-xs text-slate-400">Cuenta demo: demo@galvifintech.com / Demo1234!</p>
+    <p class="mt-6 text-center text-xs text-slate-400">Cuentas demo: cliente <b>demo@galvifintech.com</b> / Demo1234! · administrador <b>admin@galvifintech.com</b> / Admin1234!</p>
   </main>
 
   <script src="js/api.js"></script>
@@ -45,8 +45,15 @@
     const alerta = document.getElementById('alerta');
     const boton  = document.getElementById('btn-ingresar');
 
-    // Si ya hay sesion abierta, ir directo al panel
-    if (Sesion.token()) window.location.href = 'dashboard.html';
+    // Si ya hay sesion abierta, ir directo al panel que corresponde
+    if (Sesion.token()) window.location.href = Sesion.inicio();
+
+    // Mensaje que dejo una sesion cerrada por falta de pago
+    const aviso = sessionStorage.getItem('gf_aviso');
+    if (aviso) {
+      sessionStorage.removeItem('gf_aviso');
+      mostrarError(aviso);
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -64,7 +71,7 @@
       try {
         const datos = await api('/auth/login', { method: 'POST', body: { email, password } });
         Sesion.guardar(datos.token, datos.usuario);
-        window.location.href = 'dashboard.html';
+        window.location.href = Sesion.inicio();
       } catch (err) {
         mostrarError(err.message);
       } finally {
@@ -79,4 +86,4 @@
     }
   </script>
 </body>
-  </html>
+</html>
