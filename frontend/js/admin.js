@@ -11,7 +11,7 @@ const PRECIOS = { basico: 25, pyme: 45, empresa: 85 };   // USD por mes, sin IVA
 const DESCUENTOS = { 1: 0, 6: 0.05, 12: 0.15 };
 const NOMBRE_PLAN = { basico: 'Básico', pyme: 'PyME', empresa: 'Empresa' };
 const MEDIOS = { transferencia: 'Transferencia', mercadopago: 'Mercado Pago', efectivo: 'Efectivo', otro: 'Otro' };
-const usd = (v) => USD ${Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })};
+const usd = (v) => 'USD ' + (Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 let clientes = [];
 
 // ---------------------------------------------------------------------
@@ -51,7 +51,7 @@ async function cargarTodo(seleccionarId = null) {
 function etiquetaEstado(c) {
   switch (c.estado) {
     case 'activo':     return ['Activo', 'bg-blue-50 text-blue-700'];
-    case 'por_vencer': return [c.dias_restantes === 0 ? 'Vence hoy' : Vence en ${c.dias_restantes} d, 'bg-red-50 text-red-600'];
+    case 'por_vencer': return [c.dias_restantes === 0 ? 'Vence hoy' : 'Vence en ' + (c.dias_restantes) + ' d', 'bg-red-50 text-red-600'];
     case 'suspendido': return ['Suspendido', 'bg-red-600 text-white'];
     default:           return ['Sin abono', 'bg-slate-100 text-slate-600'];
   }
@@ -61,10 +61,10 @@ async function cargarClientes(seleccionarId) {
   const r = await api('/admin/clientes');
   clientes = r.clientes;
 
-  ['activo', 'por_vencer', 'suspendido', 'sin_abono'].forEach((k) => { $(kpi-${k}).textContent = r.resumen[k]; });
+  ['activo', 'por_vencer', 'suspendido', 'sin_abono'].forEach((k) => { $('kpi-' + (k)).textContent = r.resumen[k]; });
   // Las alertas se pintan de rojo solo si hay casos
-  $('kpi-por_vencer').className = mt-1 text-2xl font-bold ${r.resumen.por_vencer ? 'text-red-500' : 'text-slate-500'};
-  $('kpi-suspendido').className = mt-1 text-2xl font-bold ${r.resumen.suspendido ? 'text-red-600' : 'text-slate-500'};
+  $('kpi-por_vencer').className = 'mt-1 text-2xl font-bold ' + (r.resumen.por_vencer ? 'text-red-500' : 'text-slate-500');
+  $('kpi-suspendido').className = 'mt-1 text-2xl font-bold ' + (r.resumen.suspendido ? 'text-red-600' : 'text-slate-500');
 
   const tbody = $('tabla-clientes');
   tbody.innerHTML = '';
@@ -73,12 +73,7 @@ async function cargarClientes(seleccionarId) {
   }
   clientes.forEach((c) => {
     const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td class="py-2"><span class="block font-medium"></span><span class="block text-xs text-slate-400"></span></td>
-      <td class="py-2"></td>
-      <td class="py-2 whitespace-nowrap"></td>
-      <td class="py-2"><span class="rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"></span></td>
-      <td class="py-2 text-right"><button class="rounded-lg border border-slate-300 px-2 py-1 text-xs hover:bg-slate-50 whitespace-nowrap">Registrar pago</button></td>`;
+    fila.innerHTML = ' <td class="py-2"><span class="block font-medium"></span><span class="block text-xs text-slate-400"></span></td> <td class="py-2"></td> <td class="py-2 whitespace-nowrap"></td> <td class="py-2"><span class="rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap"></span></td> <td class="py-2 text-right"><button class="rounded-lg border border-slate-300 px-2 py-1 text-xs hover:bg-slate-50 whitespace-nowrap">Registrar pago</button></td>';
     // textContent: los datos que cargan los clientes nunca se interpretan como HTML (evita XSS)
     fila.querySelector('td:nth-child(1) span:first-child').textContent = c.empresa;
     fila.querySelector('td:nth-child(1) span:last-child').textContent = c.email;
@@ -87,7 +82,7 @@ async function cargarClientes(seleccionarId) {
     const [texto, clases] = etiquetaEstado(c);
     const badge = fila.querySelector('td:nth-child(4) span');
     badge.textContent = texto;
-    badge.className += ` ${clases}`;
+    badge.className += ' ' + (clases);
     fila.querySelector('button').addEventListener('click', () => elegirParaPago(c.id));
     tbody.append(fila);
   });
@@ -99,7 +94,7 @@ async function cargarClientes(seleccionarId) {
   clientes.forEach((c) => {
     const op = document.createElement('option');
     op.value = c.id;
-    op.textContent = ${c.empresa} (${etiquetaEstado(c)[0]});
+    op.textContent = (c.empresa) + ' (' + (etiquetaEstado(c)[0]) + ')';
     select.append(op);
   });
   if (clientes.some((c) => c.id === anterior)) select.value = anterior;
@@ -142,7 +137,7 @@ async function registrarPago(e) {
     await cargarTodo(datos.usuario_id);
   } catch (err) {
     const detalle = Object.values(err.detalles || {}).join(' ');
-    mostrarMensaje(${err.message}. ${detalle}, 'error');
+    mostrarMensaje((err.message) + '. ' + (detalle), 'error');
   }
 }
 
@@ -159,7 +154,7 @@ async function crearCliente(e) {
     await cargarTodo(r.id); // queda elegido en "Registrar pago"
   } catch (err) {
     const detalle = Object.values(err.detalles || {}).join(' ');
-    mostrarMensaje(${err.message}. ${detalle}, 'error');
+    mostrarMensaje((err.message) + '. ' + (detalle), 'error');
   }
 }
 
@@ -179,14 +174,14 @@ async function cargarPagos() {
     const celdas = [
       formatoFecha(p.creado_en),
       p.empresa,
-      ${NOMBRE_PLAN[p.plan]} · ${p.meses} ${p.meses === 1 ? 'mes' : 'meses'},
-      ${formatoFecha(p.periodo_desde)} al ${formatoFecha(p.periodo_hasta)},
-      MEDIOS[p.medio_pago] + (p.comprobante ? ` (${p.comprobante})` : ''),
+      (NOMBRE_PLAN[p.plan]) + ' · ' + (p.meses) + ' ' + (p.meses === 1 ? 'mes' : 'meses'),
+      (formatoFecha(p.periodo_desde)) + ' al ' + (formatoFecha(p.periodo_hasta)),
+      MEDIOS[p.medio_pago] + (p.comprobante ? ' (' + (p.comprobante) + ')' : ''),
       usd(p.monto_usd),
     ];
     celdas.forEach((texto, i) => {
       const td = fila.insertCell();
-      td.className = py-2 ${i === 5 ? 'text-right whitespace-nowrap' : ''} ${i === 0 || i === 3 ? 'whitespace-nowrap' : ''};
+      td.className = 'py-2 ' + (i === 5 ? 'text-right whitespace-nowrap' : '') + ' ' + (i === 0 || i === 3 ? 'whitespace-nowrap' : '');
       td.textContent = texto;
     });
     tbody.append(fila);
@@ -199,9 +194,9 @@ async function cargarPagos() {
 function mostrarMensaje(texto, tipo) {
   const caja = $('mensaje');
   caja.textContent = texto;
-  caja.className = `rounded-lg px-4 py-3 text-sm ${tipo === 'ok'
+  caja.className = 'rounded-lg px-4 py-3 text-sm ' + (tipo === 'ok'
     ? 'bg-blue-50 border border-blue-200 text-blue-800'
-    : 'bg-red-50 border border-red-200 text-red-700'}`;
+    : 'bg-red-50 border border-red-200 text-red-700');
   clearTimeout(mostrarMensaje.timer);
   mostrarMensaje.timer = setTimeout(() => caja.classList.add('hidden'), 6000);
 }
