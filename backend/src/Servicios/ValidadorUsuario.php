@@ -1,4 +1,4 @@
-[14:55, 7/11/2026] Dylan: <?php
+<?php
 declare(strict_types=1);
 
 namespace App\Servicios;
