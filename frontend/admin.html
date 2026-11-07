@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración | GalviFintech Portal</title>
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="icon" href="img/galvifintech-isotipo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+  <!-- Barra superior -->
+  <header class="bg-blue-950 text-white">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="img/galvifintech-logo-negativo.svg" alt="GalviFintech" class="h-9 w-auto" height="36" width="171">
+        <span class="hidden sm:inline text-sm text-slate-400 border-l border-slate-700 pl-3">Administración</span></div>
+      <div class="flex items-center gap-4 text-sm">
+        <span id="nombre-usuario" class="hidden sm:inline text-slate-300"></span>
+        <button id="btn-salir" class="rounded-lg border border-blue-800 px-3 py-1.5 hover:bg-blue-900">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+    <section>
+      <h1 class="text-2xl font-bold">Clientes y abonos</h1>
+      <p class="text-slate-500 text-sm">Sin días de gracia: la cuenta se suspende al día siguiente de la fecha pagada y se reactiva al registrar el pago.</p>
+    </section>
+
+    <div id="mensaje" class="hidden rounded-lg px-4 py-3 text-sm" role="status"></div>
+
+    <!-- Tarjetas resumen -->
+    <section class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Activos</p>
+        <p id="kpi-activo" class="mt-1 text-2xl font-bold text-blue-700">—</p>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Vencen en 7 días</p>
+        <p id="kpi-por_vencer" class="mt-1 text-2xl font-bold text-slate-500">—</p>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Suspendidos</p>
+        <p id="kpi-suspendido" class="mt-1 text-2xl font-bold text-slate-500">—</p>
+      </article>
+      <article class="rounded-2xl bg-white p-5 shadow-sm">
+        <p class="text-sm text-slate-500">Sin abono (nuevos)</p>
+        <p id="kpi-sin_abono" class="mt-1 text-2xl font-bold text-slate-500">—</p>
+      </article>
+    </section>
+
+    <section class="grid gap-4 lg:grid-cols-3 lg:items-start">
+      <!-- Lista de clientes -->
+      <article class="min-w-0 rounded-2xl bg-white p-5 shadow-sm lg:col-span-2">
+        <h2 class="font-semibold">Clientes</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-left text-slate-500">
+              <tr><th class="py-1">Empresa</th><th>Plan</th><th>Abono hasta</th><th>Estado</th><th></th></tr>
+            </thead>
+            <tbody id="tabla-clientes" class="divide-y"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="min-w-0 space-y-4">
+        <!-- Registrar pago -->
+        <article id="caja-pago" class="rounded-2xl bg-white p-5 shadow-sm">
+          <h2 class="font-semibold">Registrar pago</h2>
+          <form id="form-pago" class="mt-4 space-y-3 text-sm" novalidate>
+            <label class="block">Cliente
+              <select name="usuario_id" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></select>
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block">Plan
+                <select name="plan" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                  <option value="basico">Básico</option><option value="pyme">PyME</option><option value="empresa">Empresa</option>
+                </select>
+              </label>
+              <label class="block">Período
+                <select name="meses" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                  <option value="1">1 mes</option><option value="6">6 meses (−5%)</option><option value="12">12 meses (−15%)</option>
+                </select>
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block">Medio de pago
+                <select name="medio_pago" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                  <option value="transferencia">Transferencia</option><option value="mercadopago">Mercado Pago</option>
+                  <option value="efectivo">Efectivo</option><option value="otro">Otro</option>
+                </select>
+              </label>
+              <label class="block">Monto (USD)
+                <input name="monto_usd" type="number" min="0.01" step="0.01" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+              </label>
+            </div>
+            <label class="block">N° de comprobante (opcional)
+              <input name="comprobante" maxlength="50" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            </label>
+            <p class="text-xs text-slate-400">El monto se completa con el precio del plan, con descuento e IVA. Se puede modificar.</p>
+            <button type="submit" class="w-full rounded-lg bg-blue-950 py-2.5 font-semibold text-white hover:bg-blue-900">Registrar pago</button>
+          </form>
+        </article>
+
+        <!-- Alta de cliente -->
+        <article class="rounded-2xl bg-white p-5 shadow-sm">
+          <h2 class="font-semibold">Nuevo cliente</h2>
+          <form id="form-cliente" class="mt-4 space-y-3 text-sm" novalidate>
+            <label class="block">Nombre y apellido
+              <input name="nombre" required maxlength="100" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            </label>
+            <label class="block">Email
+              <input name="email" type="email" required maxlength="150" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block">Empresa
+                <input name="empresa" required maxlength="150" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+              </label>
+              <label class="block">CUIT (opcional)
+                <input name="cuit" maxlength="13" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="block">Contraseña inicial
+                <input name="password" type="text" required minlength="8" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+              </label>
+              <label class="block">Plan
+                <select name="plan" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+                  <option value="basico">Básico</option><option value="pyme" selected>PyME</option><option value="empresa">Empresa</option>
+                </select>
+              </label>
+            </div>
+            <p class="text-xs text-slate-400">La cuenta queda sin abono hasta registrar el primer pago.</p>
+            <button type="submit" class="w-full rounded-lg border border-blue-950 py-2.5 font-semibold text-blue-950 hover:bg-slate-50">Crear cliente</button>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <!-- Historial de pagos -->
+    <article class="rounded-2xl bg-white p-5 shadow-sm">
+      <h2 class="font-semibold">Últimos pagos registrados</h2>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-slate-500">
+            <tr><th class="py-1">Fecha</th><th>Empresa</th><th>Plan</th><th>Período cubierto</th><th>Medio</th><th class="text-right">Monto</th></tr>
+          </thead>
+          <tbody id="tabla-pagos" class="divide-y"></tbody>
+        </table>
+      </div>
+    </article>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
